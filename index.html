@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Emotional TTS Audio Showcase</title>
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background-color: #f8f9fa;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    .hero-section {
+      background-color: #17a2b8; /* Match EmoSphere-TTS theme */
+      color: #ffffff;
+      padding: 3rem 1rem;
+      margin-bottom: 2rem;
+    }
+    .sample-table {
+      background-color: #ffffff;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      margin-bottom: 2rem;
+      border: 1px solid #e9ecef;
+    }
+    .sample-header {
+      background-color: #f1f5f9;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid #e2e8f0;
+      color: #333333;
+    }
+    .badge-emotion {
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.35rem 0.65rem;
+      border-radius: 6px;
+    }
+    .model-cell {
+      padding: 1.25rem 1rem;
+      text-align: center;
+      vertical-align: middle;
+    }
+    .model-name {
+      font-weight: 600;
+      color: #212529;
+      margin-bottom: 0.5rem;
+    }
+    audio {
+      width: 100%;
+      max-width: 250px;
+      height: 36px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header / Section Title -->
+  <div class="hero-section text-center">
+    <div class="container">
+      <h1 class="display-6 fw-bold">Emotional TTS Quality</h1>
+      <p class="lead mb-0 text-white-50">Audio quality and emotion expressiveness comparison</p>
+    </div>
+  </div>
+
+  <!-- Audio Samples Container -->
+  <div class="container mb-5">
+    <div id="audio-container" class="col-lg-10 mx-auto"></div>
+  </div>
+
+  <script>
+    // 1. Base directory where audio folders reside
+    const baseDir = "./wavs";
+
+    // 2. Models to display (Key: Display Label, Value: Folder name inside ./wavs/)
+    const models = {
+      "Ground Truth (Reference)": "gt",
+      "Baseline Model": "baseline",
+      "Proposed Model": "proposed"
+    };
+
+    // 3. Audio dataset metadata
+    const audioData = {
+      "sample_01": {
+        emotion: "Happy",
+        badgeClass: "bg-success",
+        script: "She is now choosing a skirt to wear."
+      },
+      "sample_02": {
+        emotion: "Sad",
+        badgeClass: "bg-secondary",
+        script: "Story twenty nine, a boy and a monkey."
+      },
+      "sample_03": {
+        emotion: "Angry",
+        badgeClass: "bg-danger",
+        script: "She may mind ye of her."
+      },
+      "sample_04": {
+        emotion: "Surprise",
+        badgeClass: "bg-warning text-dark",
+        script: "The nastiest things they saw were the cobwebs."
+      },
+      "sample_05": {
+        emotion: "Neutral",
+        badgeClass: "bg-info text-dark",
+        script: "I chose the right way."
+      }
+    };
+
+    // 4. Generator function matching the EmoSphere grid logic
+    function renderComparisonTable(baseDir, models, fileId, meta) {
+      let html = `<div class="sample-table">`;
+      
+      // Header: Emotion and Script Text
+      html += `
+        <div class="sample-header">
+          <div class="d-flex align-items-center mb-1">
+            <span class="me-2 fw-bold">Emotion:</span>
+            <span class="badge ${meta.badgeClass} badge-emotion">${meta.emotion}</span>
+          </div>
+          <div>
+            <span class="fw-bold">Script:</span> 
+            <span class="fst-italic text-secondary">"${meta.script}"</span>
+          </div>
+        </div>
+      `;
+
+      // Body: Comparison Row
+      html += `<div class="table-responsive"><table class="table mb-0"><tbody><tr>`;
+      
+      for (const [modelLabel, folder] of Object.entries(models)) {
+        const audioSrc = `${baseDir}/${folder}/${fileId}.wav`;
+        html += `
+          <td class="model-cell" style="width: ${100 / Object.keys(models).length}%">
+            <div class="model-name">${modelLabel}</div>
+            <audio controls preload="none">
+              <source src="${audioSrc}" type="audio/wav">
+              Your browser does not support the audio element.
+            </audio>
+          </td>
+        `;
+      }
+
+      html += `</tr></tbody></table></div></div>`;
+      return html;
+    }
+
+    // 5. Inject tables into the DOM
+    const container = document.getElementById("audio-container");
+    for (const [fileId, meta] of Object.entries(audioData)) {
+      container.insertAdjacentHTML("beforeend", renderComparisonTable(baseDir, models, fileId, meta));
+    }
+  </script>
+
+</body>
+</html>
